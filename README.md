@@ -150,64 +150,77 @@ labels are the same. Four differences are worth knowing about:
 The port's arithmetic was checked by transliterating `+drift/DriftMonitor.m`
 back into Python and running it against `monitoring/drift.py` on both the full
 tables and the committed fixture: identical to the last bit on all 21 features
-in both cases. That validates the algorithm, **not** the MATLAB syntax — see
-"What has not been run" below.
+in both cases. That checked the algorithm rather than the MATLAB code itself;
+the fixture parity figure under "Results" is the MATLAB-side confirmation.
 
 ## Results
 
-<!-- Fill these in from a real MATLAB run. Do not estimate them. -->
+Measured in MATLAB Online, release `26.2.0.3386108 (R2026b)`.
 
 | | |
 |---|---|
-| MATLAB release | `<TO BE FILLED AFTER FIRST RUN>` |
-| Tests, total | `<TO BE FILLED AFTER FIRST RUN>` |
-| Tests, passed | `<TO BE FILLED AFTER FIRST RUN>` |
-| Suite duration | `<TO BE FILLED AFTER FIRST RUN>` |
+| Environment | MATLAB Online |
+| MATLAB release | `26.2.0.3386108 (R2026b)` |
+| Tests, total | 24 |
+| Tests, passed | 24 |
+| Tests, failed | 0 |
 
-**Parity, full tables** (largest absolute difference against the published
-Python values): `<TO BE FILLED AFTER FIRST RUN>`
+Run with `runtests('tests')`.
 
-**Parity, committed fixture** (largest absolute difference against
-`data/expected_psi_fixture.csv`): `<TO BE FILLED AFTER FIRST RUN>`
+### Parity
 
-**Detector trials**, counts printed by the tests themselves:
+Parity was checked **on the committed 2,000-row fixture only**. `data/full/`
+was not present, so `parity` took the fixture path and compared against
+`data/expected_psi_fixture.csv`.
+
+| | |
+|---|---|
+| Features compared | 21 of 21 |
+| Largest absolute difference | 1.388e-17, on `n_total_30d` |
+| Verdicts | matched; `tenure_days` watch at 0.1534, all others stable |
+
+**The full-table parity run has not been done.** The comparison against the
+50,000-row snapshots and the values published in the `lead-scoring-mlops`
+README is still outstanding — see "Parity run on the full tables" above for
+how to set it up.
+
+### Detector trials
+
+100 trials per row with a fixed seed, counts printed by the tests themselves:
 
 | Scenario | Flagged | Mean worst PSI | Max worst PSI |
 |---|---|---|---|
-| Same distribution | `<TO BE FILLED>` / 100 | `<TO BE FILLED>` | `<TO BE FILLED>` |
-| Shifted 25% | `<TO BE FILLED>` / 100 | `<TO BE FILLED>` | `<TO BE FILLED>` |
-| Shifted 5% | `<TO BE FILLED>` / 100 | `<TO BE FILLED>` | `<TO BE FILLED>` |
+| Same distribution | 0 / 100 | 0.0087 | 0.0138 |
+| Shifted 25% | 100 / 100 | 0.9848 | 1.1229 |
+| Shifted 5% | 0 / 100 | 0.0513 | 0.0749 |
 
 For reference, the Python suite reports 0/100, 100/100 and 0/100 for those
-three rows. The MATLAB numbers are drawn from a different random stream and
-are expected to differ in detail.
+three rows. These are a different random stream, so the counts agreeing is
+the point; the PSI summaries are not expected to match digit for digit.
 
 ## What has not been run
 
-MATLAB is not installed on the machine this was written on, so **no MATLAB
-code in this repository has been executed**. Nothing above is reported as a
-measured result, and every number that would come from a run is a placeholder.
+The test suite and `parity` have been run (see Results). These have not:
 
-Specifically unverified:
+- **Parity against the full 50,000-row tables.** Only the fixture comparison
+  has been done.
+- **`demo.m` and `plot_psi.m`.** Neither was exercised by the run above, so
+  nothing here reports that `docs/psi.png` renders or that `exportgraphics`
+  works in that environment.
+- **The GitHub Actions workflow.** `.github/workflows/matlab.yml` exists and
+  parses as YAML with every action pinned to a 40-character commit SHA, but
+  it has never completed a run. No claim is made that CI passes. Note the
+  workflow pins R2024b, while the results above come from R2026b.
 
-- That the `.m` files parse and run at all. They were read through twice for
-  syntax, undefined names, and toolbox calls, and the identifier list was
-  checked against a list of Statistics and ML Toolbox functions, but reading
-  is not running.
-- Every assertion in the test suite, and the test count.
-- The PSI values MATLAB actually produces, and therefore the parity figure.
-- That `plot_psi.m` renders, and that `exportgraphics` works headless here.
-- That the GitHub Actions workflow succeeds.
-
-What *was* verified, on this machine, without MATLAB:
+Checked on the authoring machine without MATLAB, and still worth knowing:
 
 - The Python side reproduces its own published README values exactly.
-- The port's arithmetic, by transliteration (see above): bit-identical on all
-  21 features, on both the full tables and the fixture.
+- The port's arithmetic, by transliterating `+drift/DriftMonitor.m` into
+  Python and running it against `monitoring/drift.py`: bit-identical on all
+  21 features, on both the full tables and the fixture. This is what the
+  1.388e-17 fixture result above independently confirms in MATLAB itself.
 - `quantileLinear`'s rule against `numpy.quantile`: bit-identical on every
   numeric column of the reference snapshot.
-- The workflow file parses as YAML and every action is pinned to a 40-character
-  commit SHA.
 
 ## Limitations
 
@@ -239,8 +252,9 @@ What *was* verified, on this machine, without MATLAB:
 ## Troubleshooting
 
 Problems actually hit while building this, and the fix for each. Most were
-found by reading rather than running, because MATLAB was not available; this
-section should grow after the first real run.
+found by reading rather than running, because MATLAB was not available on the
+machine this was written on. The first MATLAB Online run hit none of them
+again, and raised nothing new.
 
 - **The CI workflow would not parse as YAML.** The step
   `command: fprintf('MATLAB release: %s\n', ...)` contains a colon followed by
