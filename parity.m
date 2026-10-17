@@ -70,7 +70,7 @@ for i = 1:height(result)
     pythonPsi = row.(expectedCol)(1);
     diffValue = abs(matlabPsi - pythonPsi);
     comparedCount = comparedCount + 1;
-    if diffValue > worstDiff
+    if comparedCount == 1 || diffValue > worstDiff
         worstDiff = diffValue;
         worstFeature = name;
     end
