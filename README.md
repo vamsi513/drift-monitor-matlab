@@ -91,6 +91,14 @@ values published in the `lead-scoring-mlops` README, held in
 `data/python_psi_full.csv`. Those published values are rounded to four
 decimals, so up to 5e-5 of the difference is rounding alone.
 
+One note on that source table: it summarises the unnamed features as
+"… 14 others ≤ 0.0488". There are 17 numeric and 4 categorical features and
+seven numeric ones are named individually, so the remainder is **10**, not 14
+(7 + 14 + 4 would be 25 features, and there are 21). The 0.0488 bound itself
+is right — it is `trend_excess`. `data/python_psi_full.csv` therefore carries
+11 published values and marks 10 features as having no published value; those
+are printed by `parity` but excluded from the largest-difference figure.
+
 ## Project layout
 
 | Path | What it is |
