@@ -1,0 +1,11 @@
+# Full feature tables for the parity run are not committed (see README).
+data/full/
+
+# MATLAB artefacts
+*.asv
+*.autosave
+slprj/
+codegen/
+
+# Test output
+test-results/
