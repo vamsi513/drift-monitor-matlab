@@ -98,7 +98,7 @@ classdef DriftMonitor
             obj.FeatureKinds = string.empty(1, 0);
 
             for name = featureNames
-                column = referenceTable.(name);
+                column = referenceTable.(char(name));
                 key = char(matlab.lang.makeValidName(name));
 
                 if drift.DriftMonitor.isNumericColumn(column)
@@ -152,7 +152,7 @@ classdef DriftMonitor
                     error('drift:DriftMonitor:unknownFeature', ...
                         'Current table has no column named "%s".', name);
                 end
-                column = currentTable.(name);
+                column = currentTable.(char(name));
 
                 if obj.FeatureKinds(i) == "numeric"
                     psi(i) = drift.DriftMonitor.psiNumeric( ...
